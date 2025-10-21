@@ -14,6 +14,11 @@ jobs:
     name: Dependency Vulnerability Scan
     runs-on: ubuntu-latest
 
+      # Práctica recomendada: definir permisos explícitamente para seguridad
+    permissions:
+      contents: read # Necesario para hacer checkout del código
+      actions: read  # Permite que las acciones funcionen correctamente
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,18 +33,19 @@ jobs:
         run: mvn clean install -DskipTests
 
       - name: Run OWASP Dependency-Check
-        uses: dependency-check/Dependency-Check_Action@main
+        uses: dependency-check/Dependency-Check_Action@v4
         with:
           project: 'SpringBootApp'
           path: '.'
           format: 'HTML'
-          output-directory: './reports'
+          out: 'reports'
 
       - name: Upload OWASP report
         uses: actions/upload-artifact@v4
         with:
           name: owasp-report
-          path: ./reports
+          path: reports
+          retention-days: 7
 
   # --- Job 2: Análisis estático con CodeQL ---
   codeql-analysis:
